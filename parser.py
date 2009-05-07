@@ -75,9 +75,11 @@ class Parser(object):
             info['pub_date'] = self._parse_date(info['pub_date'])
             info['id'] = int(info['id'])
 
-            items = item.xml_xpath('category')
-            info['categories'] = self._get_categories(items)
-            info['tags'] = self._get_tags(items)
+            cat_tags = item.xml_xpath('category')
+            info['categories'] = self._get_categories(cat_tags)
+            info['tags'] = self._get_tags(cat_tags)
+
+            info['comments'] = self._get_comments(item)
 
             self.items.append(info)
 
@@ -92,6 +94,11 @@ class Parser(object):
         # by using +0000
         return datetime.strptime(input, "%a, %d %b %Y %H:%M:%S +0000")
 
+    def _parse_datetime(self, input):
+        """Another method to parse a full datetime"""
+        return datetime.strptime(input, "%Y-%m-%d %H:%M:%S")
+        
+
     def _get_categories(self, items):
         """Return only categories from the items"""
         return _to_unicode([item for item in items if \
@@ -102,6 +109,46 @@ class Parser(object):
         return _to_unicode([item for item in items if \
                 getattr(item, 'domain', None) == 'tag'])
 
+    def _get_comments(self, item):
+        """Return comments from the item"""
+
+        return [self._parse_comment(comment) for comment in \
+                item.xml_xpath('wp:comment')]
+
+    def _parse_comment(self, comment):
+        """Parse an individual comment into a usable format"""
+
+        get_node = lambda x: comment.xml_xpath(x).pop()
+
+        new_comment = _to_unicode({
+            "id": get_node("wp:comment_id"),
+            "author": get_node("wp:comment_author"),
+            "email": get_node("wp:comment_author_email"),
+            "url": get_node("wp:comment_author_url"),
+            "ip": get_node("wp:comment_author_IP"),
+            "datetime": get_node("wp:comment_date"),
+            "content": get_node("wp:comment_content"),
+            "status": get_node("wp:comment_approved")})
+
+
+        new_comment['id'] = int(new_comment['id'])
+        new_comment['status'] = self._parse_status(new_comment['status'])
+        new_comment['datetime'] = self._parse_datetime(new_comment['datetime'])
+
+        return new_comment
+
+    def _parse_status(self, status):
+        """Wordpress has a funky way of returning status values. Sometimes it
+        returns a number, and sometimes it returns a number. This method 
+        normalizes all values to strings"""
+
+        return {
+            "0": "unapproved",
+            "1": "approved"}.get(status, status)
+            
+
+
+
 
 
 if __name__ == "__main__":
@@ -109,4 +156,4 @@ if __name__ == "__main__":
     file = sys.argv[1]
     parser = Parser(file)
     for info in parser.entries:
-        print info
+        print len(info['comments'])

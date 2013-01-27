@@ -1,8 +1,0 @@
-django-wordpress-parser is a module designed to ease the process of migrating
-your blog from Wordpress to Django. This will not automatically convert
-everything for you, but will help in some areas.
-
-Currently the parser only provides an example of importing data into a custom
-blog. There are no standard importers (yet).
-
-However, comments can be imported to Django's standard comments application.

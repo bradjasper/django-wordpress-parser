@@ -1,32 +1,3 @@
-"""
-    WXR Parser (Wordpress eXtended RSS Parser)
-
-    This is a WXP parser to handle migrating Wordpress to something in
-    Python. This will not import to your project for you. You will have to
-    connect the pieces. This just makes it easier to export from Wordpress.
-
-    Author: Brad Jasper
-    Site: http://bradjasper.com
-    Version: 0.1b
-    Date: January 31, 2009
-
-    Usage:
-
-    import wxr_exporter
-    parser = wxr_exporter.Parser('wordpress.2009-01-31.xml')
-
-    for info in parser.entries:
-        print info
-
-    Notes:
-
-    This also uses amara for XML parsing. I did this because I think its the
-    best Python XML parsing lib. Its namespace support is better than
-    everyone elses. It does however have this funky behaviour of having to
-    convert everything to unicode objects before its useful. If you know how
-    to get around this please e-mail me.
-"""
-import sys
 from datetime import datetime
 import amara
 
@@ -55,7 +26,6 @@ class Parser(object):
 
         doc = amara.parse(file)
 
-        items = []
         for item in doc.xml_xpath('*//item'):
 
             get_node = lambda x: item.xml_xpath(x).pop()
@@ -146,14 +116,10 @@ class Parser(object):
             "0": "unapproved",
             "1": "approved"}.get(status, status)
             
-
-
-
-
-
 if __name__ == "__main__":
-    
+    import sys
+    import pprint
     file = sys.argv[1]
     parser = Parser(file)
-    for info in parser.entries:
-        print len(info['comments'])
+    for entry in parser.entries:
+        pprint.pprint(entry)

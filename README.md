@@ -17,5 +17,9 @@ Comments are extracted so they work with the standard Django comments applicatio
         # Import entries into your blog here
         print entry
 
+
 ## Contact
-http://bradjasper.com
+
+Web: http://bradjasper.com<br>
+Twitter: <a href="https://twitter.com/bradjasper">@bradjasper</a><br>
+Email: <a href="mailto:contact@bradjasper.com">contact@bradjasper.com</a><br>
